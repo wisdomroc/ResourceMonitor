@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/">
+        <file>img/monitor.ico</file>
+        <file>img/monitor.png</file>
+        <file>class_structure.qmodel</file>
+        <file>img/block.png</file>
+        <file>img/icdin.png</file>
+        <file>img/icdout.png</file>
+        <file>img/package.png</file>
+        <file>pure.qss</file>
+        <file>img/arrow_down.png</file>
+        <file>img/greenball.png</file>
+        <file>img/redball.png</file>
+        <file>img/yellowball.png</file>
+        <file>img/refresh.png</file>
+    </qresource>
+</RCC>

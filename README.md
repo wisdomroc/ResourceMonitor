@@ -1,0 +1,2 @@
+主要是打开xml文件，然后进行内容展示的一个程序
+包括了Qt的Model&View使用；自定义显示模块PercentUnit的封装
