@@ -13,5 +13,7 @@
         <file>img/redball.png</file>
         <file>img/yellowball.png</file>
         <file>img/refresh.png</file>
+        <file>img/delete.png</file>
+        <file>img/totop.png</file>
     </qresource>
 </RCC>

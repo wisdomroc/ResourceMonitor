@@ -3,11 +3,14 @@
 #include <QDebug>
 #include <QScrollBar>
 #include <QResizeEvent>
+#include <QAction>
 
 PercentUnit::PercentUnit(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::PercentUnit),
-    flowLayout_(new FlowLayout(this))
+    flowLayout_(new FlowLayout(this)),
+    canShowMenu_(false),
+    currentBlock_(nullptr)
 {
     ui->setupUi(this);
     setFocusPolicy(Qt::StrongFocus);
@@ -62,6 +65,7 @@ void PercentUnit::resizeEvent(QResizeEvent *event)
 
 void PercentUnit::mousePressEvent(QMouseEvent *event)
 {
+    canShowMenu_ = false;
     QPoint point = event->pos();
     point.ry() += ui->scrollArea->verticalScrollBar()->value();
     qDebug() << "point---->" << point << endl;
@@ -73,9 +77,19 @@ void PercentUnit::mousePressEvent(QMouseEvent *event)
             one->setActive(true);
             QString blockFullname = one->getBlockFullName();
             emit activeBlock(blockFullname);
+            canShowMenu_ = true;
+            currentBlock_ = one;
         } else {
             one->setActive(false);
         }
+    }
+}
+
+void PercentUnit::contextMenuEvent(QContextMenuEvent *event)
+{
+    if(canShowMenu_) {
+        canShowMenu_ = false;
+        menu_.popup(mapToGlobal(event->pos()));
     }
 }
 
@@ -94,8 +108,29 @@ void PercentUnit::initUi()
 
 
     ui->scrollAreaWidgetContents->setLayout(flowLayout_);
+
+    QAction* action_top = menu_.addAction(QIcon(":/img/totop.png"), QStringLiteral("放到最前"));
+    connect(action_top, SIGNAL(triggered(bool)), this, SLOT(slot_top(bool)));
 }
 
 void PercentUnit::initConnections()
 {
+}
+
+void PercentUnit::slot_top(bool checked)
+{
+    if(currentBlock_) {
+        blockList_.removeOne(currentBlock_);
+        blockList_.insert(0, currentBlock_);
+
+        int itemCount = flowLayout_->count();
+        for(int i = itemCount - 1; i >= 0; --i) {
+            QWidget *widget = flowLayout_->itemAt(i)->widget();
+            flowLayout_->removeWidget(widget);
+        }
+
+        for(auto& block : blockList_) {
+            flowLayout_->addWidget(block);
+        }
+    }
 }

@@ -77,6 +77,10 @@ void DataCenter::setIcdAndXcdFilePath(const QString &icdPath, const QString &xcd
     qDebug() <<"readXmlICDs time= " <<time<<"ms";// 输出运行时间（ms）
 }
 
+const QMultiHash<QString, BlockInfoPtr>& DataCenter::getFilterInfos() const
+{
+    return blockInfoMultiHash_;
+}
 
 QStringList DataCenter::getFilterNames() const
 {
@@ -99,7 +103,15 @@ QMap<QString, QMap<QString, InfoTuple> > DataCenter::getDatasPercent(const QStri
 
     if(!names.empty()) {
         for(const auto &name : names) {
-            QList<BlockInfoPtr> blocks = blockInfoMultiHash_.values(name);
+            QString name1 = name.mid(name.lastIndexOf("/")+1, -1);
+            QList<BlockInfoPtr> blocks = blockInfoMultiHash_.values(name1);
+            auto itor = std::find_if(blocks.begin(), blocks.end(), [name](BlockInfoPtr ptr){return ptr->namepath == name;});
+            if(itor != blocks.end())
+            {
+                BlockInfoPtr ptr = *itor;
+                blocks.clear();
+                blocks.append(ptr);
+            }
             processBlock(blocks, types, showLevel, retMap);
         }
     } else {

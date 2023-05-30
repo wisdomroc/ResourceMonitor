@@ -188,6 +188,16 @@
        <number>0</number>
       </property>
       <item>
+       <widget class="ComboBox" name="comboBox">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>26</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QSplitter" name="splitter">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -416,13 +426,18 @@
   <customwidget>
    <class>WComboBox</class>
    <extends>QComboBox</extends>
-   <header location="global">wcombobox.h</header>
+   <header>wcombobox.h</header>
   </customwidget>
   <customwidget>
    <class>PercentUnit</class>
    <extends>QWidget</extends>
    <header>percentunit.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">combobox.h</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -23,6 +23,7 @@
 #include <QDebug>
 #include <QTableWidget>
 #include <QHeaderView>
+#include <QMenu>
 #include "callout.h"
 #include "global.h"
 
@@ -287,6 +288,7 @@ public:
 protected:
     void resizeEvent(QResizeEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
+    void contextMenuEvent(QContextMenuEvent *event) override;
 
 private:
     void initUi();
@@ -295,11 +297,17 @@ private:
 signals:
     void activeBlock(const QString& blockFullname);
 
+private slots:
+    void slot_top(bool checked);
+
 private:
     Ui::PercentUnit     *ui;
     FlowLayout          *flowLayout_;
     QList<OneBlock *>   blockList_;
     ShowMode            showMode_;
+    QMenu               menu_;
+    bool                canShowMenu_;
+    OneBlock*           currentBlock_;
 };
 
 #endif // PERCENTUNIT_H

@@ -33,7 +33,10 @@ SOURCES += \
     percentunit.cpp \
     readxmlrunnable.cpp \
     treemodel.cpp \
-    callout.cpp
+    callout.cpp \
+    MultiSelectComboBox.cpp \
+    wcombobox.cpp \
+    combobox.cpp
 
 HEADERS += \
         resource_monitor.h \
@@ -46,7 +49,9 @@ HEADERS += \
     global.h \
     readxmlrunnable.h \
     treemodel.h \
-    callout.h
+    callout.h \
+    MultiSelectComboBox.h \
+    combobox.h
 
 FORMS += \
         resource_monitor.ui \

@@ -60,7 +60,7 @@ protected:
             return true;
         }
 
-        QString data =  sourceModel()->index(sourceRow, 0, sourceParent).data(Qt::DisplayRole).toString();
+        QString data =  sourceModel()->index(sourceRow, 0, sourceParent).data(Qt::ToolTipRole).toString();
         if(keyStrs.contains(data))
         {
             return true;

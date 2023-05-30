@@ -43,6 +43,7 @@ public:
         }
     }
 
+    const QMultiHash<QString, BlockInfoPtr>& getFilterInfos() const;
     QStringList getFilterNames() const;
     QStringList getFilterTypes() const;
 

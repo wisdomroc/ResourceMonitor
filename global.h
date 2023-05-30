@@ -64,7 +64,7 @@ struct BlockInfo {
 using BlockInfoPtr = std::shared_ptr<BlockInfo>;
 
 struct Node {
-    Node(const QString& name = "", int type = -1, int number = -1):name_(name),type_(type),parentNode_(nullptr),number_(number){}
+    Node(const QString& name = "", const QString& fullname = "", int type = -1, int number = -1):name_(name),fullname_(fullname),type_(type),parentNode_(nullptr),number_(number){}
     void appendChild(Node *node) {
         node->number_ = childNodes_.size();
         node->parentNode_ = this;
@@ -91,6 +91,7 @@ struct Node {
     }
 
     QString         name_;       //名称
+    QString         fullname_;   //完整路径
     int             type_;       //类型
     Node*           parentNode_; //父节点
     QList<Node*>    childNodes_; //子节点

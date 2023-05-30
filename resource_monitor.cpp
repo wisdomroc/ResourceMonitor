@@ -19,6 +19,14 @@ ResourceMonitor::ResourceMonitor(const QString &iwrpFilename, const QString &icd
     ui->setupUi(this);
     ui->widget->setFocusPolicy(Qt::StrongFocus);
 
+    QStringList strList;
+    strList << "1" << "12" << "123" << "1234" << "12345";
+    for(auto& str : strList) {
+
+        ui->comboBox->addItem(str);
+    }
+
+
     setIwrpFilePath(iwrpFilename);
     setIcdAndXcdFilePath(icdFilepath, xcdFilepath);
 
@@ -42,7 +50,7 @@ ResourceMonitor::~ResourceMonitor()
 void ResourceMonitor::initUi()
 {
     setWindowTitle(APPLICATION_NAME_CH + " " + APPLICATION_VERSION);
-    ui->comboBox_nameFilter->addItems(dataCenter_.getFilterNames());
+    ui->comboBox_nameFilter->addItems(dataCenter_.getFilterInfos());
     ui->comboBox_typeFilter->addItems(dataCenter_.getFilterTypes());
     ui->comboBox_nameFilter->setCurrentText("");
     ui->comboBox_typeFilter->setCurrentText("");
@@ -94,7 +102,7 @@ void ResourceMonitor::initUi()
 void ResourceMonitor::refreshUi()
 {
     ui->widget->clearAllBlock();
-    QStringList filterNames = ui->comboBox_nameFilter->getCheckedData();
+    QStringList filterNames = ui->comboBox_nameFilter->getCheckedToolTipData();
     QStringList filterTypes = ui->comboBox_typeFilter->getCheckedData();
 
 

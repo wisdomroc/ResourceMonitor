@@ -37,6 +37,10 @@ QVariant TreeModel::data(const QModelIndex &index, int role) const
     {
         return item->name_;
     }
+    if(role == Qt::ToolTipRole)
+    {
+        return item->fullname_;
+    }
     if(role == Qt::DecorationRole)
     {
         Node *item = nodeFromIndex(index);
