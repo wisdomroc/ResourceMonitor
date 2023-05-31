@@ -61,11 +61,16 @@ public:
         return iwrp2FilePath_;
     }
 
+    QString getUuidName(const QString& uuid) const {
+        return uuidNameMap_.value(uuid);
+    }
+
 private slots:
     void slot_DoneICDInfo(ICDInfo icdInfo, bool isXcd);
 
 private:
     QMultiHash<QString, BlockInfoPtr> blockInfoMultiHash_;
+    QMap<QString, QString>            uuidNameMap_;
     QStringList blockTypes_;
 
     QMap<QString, ICDInfo> icdInfoMap_;

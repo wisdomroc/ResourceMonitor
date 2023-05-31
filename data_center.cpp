@@ -95,25 +95,23 @@ QStringList DataCenter::getFilterTypes() const
     return blockTypes_;
 }
 
-QMap<QString, QMap<QString, InfoTuple> > DataCenter::getDatasPercent(const QStringList &names, const QStringList &types, ShowLevel showLevel)
+QMap<QString, QMap<QString, InfoTuple> > DataCenter::getDatasPercent(const QStringList &uuids, const QStringList &types, ShowLevel showLevel)
 {
+    uuidNameMap_.clear();
     QMultiMap<QString, QMap<QString, InfoTuple> > retMap;
     QElapsedTimer mstimer;
     mstimer.start();
 
-    if(!names.empty()) {
-        for(const auto &name : names) {
-            QString name1 = name.mid(name.lastIndexOf("/")+1, -1);
-            QList<BlockInfoPtr> blocks = blockInfoMultiHash_.values(name1);
-            auto itor = std::find_if(blocks.begin(), blocks.end(), [name](BlockInfoPtr ptr){return ptr->namepath == name;});
-            if(itor != blocks.end())
-            {
-                BlockInfoPtr ptr = *itor;
-                blocks.clear();
-                blocks.append(ptr);
+    if(!uuids.empty()) {
+        for(const auto &uuid : uuids) {
+            auto itor = std::find_if(blockInfoMultiHash_.begin(), blockInfoMultiHash_.end(), [uuid](BlockInfoPtr one){return one->uuid == uuid;});
+            if(itor != blockInfoMultiHash_.end()) {
+                QList<BlockInfoPtr> blocks;
+                blocks.append(*itor);
+                processBlock(blocks, types, showLevel, retMap);
             }
-            processBlock(blocks, types, showLevel, retMap);
         }
+
     } else {
             processBlock(blockInfoMultiHash_.values(), types, showLevel, retMap);
     }
@@ -184,7 +182,8 @@ void DataCenter::processBlock(const QList<BlockInfoPtr> &blocks, const QStringLi
                 oneBlockPercents.insert(type, std::make_tuple(QString::number(percent, 'f', 2), realSize, customSize));
 //                qDebug() << "==========>" << block->name << "," << type << "," << QString::number(percent, 'f', 2) << endl;
             }
-            retMap.insertMulti(block->name + "\n(\n" + block->namepath + "\n)", oneBlockPercents);
+            retMap.insertMulti(block->uuid, oneBlockPercents);
+            uuidNameMap_.insert(block->uuid, block->name + "\n(\n" + block->namepath + "\n)");
         }
     }
 }

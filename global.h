@@ -30,6 +30,8 @@ enum ShowLevel {
     RYGLevel    = RedLevel | YellowLevel | GreenLevel
 };
 
+const int UUID_ROLE = Qt::UserRole + 1;
+
 
 struct ICDInfo {
     ICDInfo():size_(0) {
@@ -92,6 +94,7 @@ struct Node {
 
     QString         name_;       //名称
     QString         fullname_;   //完整路径
+    QString         uuid_;       //uuid
     int             type_;       //类型
     Node*           parentNode_; //父节点
     QList<Node*>    childNodes_; //子节点

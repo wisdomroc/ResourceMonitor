@@ -102,29 +102,30 @@ void ResourceMonitor::initUi()
 void ResourceMonitor::refreshUi()
 {
     ui->widget->clearAllBlock();
-    QStringList filterNames = ui->comboBox_nameFilter->getCheckedToolTipData();
+    QStringList filterUuids = ui->comboBox_nameFilter->getCheckedUuidData();
     QStringList filterTypes = ui->comboBox_typeFilter->getCheckedData();
 
 
     QString keyStr = "";
-    if(filterNames.size() > 0) {
-        keyStr = filterNames.join("|");
+    if(filterUuids.size() > 0) {
+        keyStr = filterUuids.join("|");
         QRegExp regExp(keyStr, Qt::CaseInsensitive, QRegExp::RegExp);
         sortFilter_->setFilterRegExp(regExp);
     } else {
         sortFilter_->setFilterRegExp(nullptr);
     }
 
-    if(!filterNames.empty()) {
+    if(!filterUuids.empty()) {
         ui->treeView->expandAll();
     }
 
 
 
-    datasPercent_ = dataCenter_.getDatasPercent(filterNames, filterTypes, showLevel_);
+    datasPercent_ = dataCenter_.getDatasPercent(filterUuids, filterTypes, showLevel_);
     for(auto data = datasPercent_.begin(); data != datasPercent_.end(); ++data) {
-        QString blockName = data.key();
-        ui->widget->addBlockPercent(blockName, data.value());
+        QString blockUuid = data.key();
+        QString blockName = dataCenter_.getUuidName(blockUuid);
+        ui->widget->addBlockPercent(blockName, blockUuid, data.value());
     }
 
     checkWorkMode();
@@ -144,9 +145,9 @@ void ResourceMonitor::slot_changeTheme(int theme)
     ui->widget->setTheme(QChart::ChartTheme(theme));
 }
 
-void ResourceMonitor::slot_activeBlockTreeView(const QString &blockFullname)
+void ResourceMonitor::slot_activeBlockTreeView(const QString &uuid)
 {
-    QModelIndex index       = treeMode_->indexFromNodeFullName(blockFullname);
+    QModelIndex index       = treeMode_->indexFromNodeUuid(uuid);
     QModelIndex index_proxy = sortFilter_->mapFromSource(index);
     if(!index_proxy.isValid()) {
         qDebug() <<"index_proxy is InValid" << endl;
@@ -167,16 +168,7 @@ void ResourceMonitor::slot_treeViewPressed(const QModelIndex& index)
     if(curNode->type_ != 2)
         return;
 
-    QStringList fullnameList;
-    QModelIndex index_src = index;
-    while (index_src.parent().isValid()) {
-        QString name = index_src.data().toString();
-        fullnameList.insert(0, "/" + name);
-        index_src = index_src.parent();
-    }
-    fullnameList.insert(0, "/" + index_src.data().toString());
-
-    ui->widget->activeOneBlock(fullnameList.join("\n"));
+    ui->widget->activeOneBlock(curNode->uuid_);
 }
 
 void ResourceMonitor::on_pushButton_clearName_clicked()

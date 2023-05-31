@@ -136,7 +136,7 @@ class OneBlock : public QFrame
 {
     Q_OBJECT
 public:
-    explicit OneBlock(const QString &name, const QMap<QString, InfoTuple>& icdPercents, QWidget *parent = nullptr): QFrame (parent), name_(name), icdPercents_(icdPercents){
+    explicit OneBlock(const QString &name, const QString &uuid, const QMap<QString, InfoTuple>& icdPercents, QWidget *parent = nullptr): QFrame (parent), name_(name), uuid_(uuid), icdPercents_(icdPercents){
         setObjectName("BorderFrame");
         setStyleSheet("#BorderFrame { border: 2px solid gray; }");
         QHBoxLayout *hBoxLayout = new QHBoxLayout(this);
@@ -238,19 +238,24 @@ public:
         }
     }
 
-    QString getBlockFullName() {
+    QString getBlockFullName() const {
         int index_left_bracket  = name_.indexOf("\n(");
         int index_right_bracket = name_.indexOf("\n)");
         QString fullname = name_.mid(index_left_bracket + 3, index_right_bracket - index_left_bracket - 3);
         return fullname;
     }
 
-    QList<OnePercent*> getPercentList() {
+    QString getBlockUuid() const {
+        return uuid_;
+    }
+
+    QList<OnePercent*> getPercentList() const {
         return percentList_;
     }
 
 private:
     QString                 name_;
+    QString                 uuid_;
     QMap<QString, InfoTuple>  icdPercents_;
     QHBoxLayout             hBoxLayout_;
     QList<OnePercent*>      percentList_;
@@ -280,9 +285,9 @@ public:
         }
     }
 
-    void activeOneBlock(const QString& blockpath);
+    void activeOneBlock(const QString& uuid);
 
-    void addBlockPercent(const QString &name, QMap<QString, InfoTuple> icdPercents);
+    void addBlockPercent(const QString &name,  const QString &uuid, QMap<QString, InfoTuple> icdPercents);
     void clearAllBlock();
 
 protected:

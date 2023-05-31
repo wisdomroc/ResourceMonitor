@@ -88,6 +88,7 @@ void ReadXmlRunnable::findChildModule(QMultiHash<QString, BlockInfoPtr>& blockIn
 
             blockInfo->namepath = getNodePath(node);
             node->fullname_ = blockInfo->namepath;
+            node->uuid_     = blockInfo->uuid;
             findChildModule(blockInfoMultiHash, blockTypes, module.child("submodule").child("modules"), blockInfo, node);
         } else if (type == "5") {   //! 是IcdInGroup
             ICDGroupInfoPtr icdGroupInfo = std::make_shared<ICDGroupInfo>();

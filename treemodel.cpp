@@ -37,6 +37,10 @@ QVariant TreeModel::data(const QModelIndex &index, int role) const
     {
         return item->name_;
     }
+    if(role == UUID_ROLE)
+    {
+        return item->uuid_;
+    }
     if(role == Qt::ToolTipRole)
     {
         return item->fullname_;
@@ -120,45 +124,25 @@ Qt::ItemFlags TreeModel::flags(const QModelIndex &index) const
     return flags;
 }
 
-Node* findNode(Node* node, QStringList blockFullnames)
+QModelIndex TreeModel::indexFromNodeUuid(QString uuid, Node* node) const
 {
+    QModelIndex index;
+    if(!node) {
+        node = rootNode_;
+    }
+
     for(auto childNode : node->childNodes_) {
-        if(childNode->name_ == blockFullnames.at(0)) {
-            blockFullnames.removeFirst();
-            if(blockFullnames.empty()) {
-                return childNode;
-            } else {
-                return findNode(childNode, blockFullnames);
+        if(childNode->uuid_ == uuid) {
+            index = createIndex(childNode->row(), 0, childNode);
+            break;
+        } else {
+            index = indexFromNodeUuid(uuid, childNode);
+            if(index != QModelIndex()) {
+                break;
             }
         }
     }
-}
-
-QModelIndex TreeModel::indexFromNodeFullName(QString blockFullname) const
-{
-//    std::function<Node* (Node*, QStringList)> findNode = [this, findNode](Node* node, QStringList blockFullnames) {
-//        for(auto childNode : node->childNodes_) {
-//            if(childNode->name_ == blockFullnames.at(0)) {
-//                blockFullnames.removeFirst();
-//                if(blockFullnames.empty()) {
-//                    return childNode;
-//                } else {
-//                    return findNode(childNode, blockFullnames);
-//                }
-//            }
-//        }
-//    };
-
-    Node* node = nullptr;
-    QStringList blockFullnames = blockFullname.remove("\n").split("/", QString::SkipEmptyParts);
-    for(auto childNode : rootNode_->childNodes_) {
-
-        if(childNode->name_ == blockFullnames.first()) {
-            blockFullnames.removeFirst();
-            node = findNode(childNode, blockFullnames);
-        }
-    }
-    return createIndex(node->row(), 0, node);
+    return index;
 }
 
 Node* TreeModel::nodeFromIndex(const QModelIndex &index) const

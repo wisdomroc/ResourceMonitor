@@ -36,8 +36,10 @@ public:
     int                 columnCount(const QModelIndex &parent) const override;
     Qt::ItemFlags       flags(const QModelIndex &index) const override;
 
-    QModelIndex         indexFromNodeFullName(QString blockFullname) const;
     Node*               nodeFromIndex(const QModelIndex &index) const;
+    QModelIndex         indexFromNodeUuid(QString uuid, Node *node = nullptr) const;
+
+
 private:
     QStringList headers_;   //水平表头
     Node*       rootNode_;  //根节点
@@ -60,7 +62,7 @@ protected:
             return true;
         }
 
-        QString data =  sourceModel()->index(sourceRow, 0, sourceParent).data(Qt::ToolTipRole).toString();
+        QString data =  sourceModel()->index(sourceRow, 0, sourceParent).data(UUID_ROLE).toString();
         if(keyStrs.contains(data))
         {
             return true;

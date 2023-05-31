@@ -23,11 +23,11 @@ PercentUnit::~PercentUnit()
     delete ui;
 }
 
-void PercentUnit::activeOneBlock(const QString &blockpath)
+void PercentUnit::activeOneBlock(const QString &uuid)
 {
     for(auto block : blockList_) {
-        QString fullname = block->getBlockFullName();
-        if(fullname == blockpath) {
+        QString blockUuid = block->getBlockUuid();
+        if(blockUuid == uuid) {
             block->setActive(true);
             QPoint positionPos = block->mapToParent(QPoint(0,0));
             ui->scrollArea->verticalScrollBar()->setValue(positionPos.y());//scrollTo the current block
@@ -37,9 +37,9 @@ void PercentUnit::activeOneBlock(const QString &blockpath)
     }
 }
 
-void PercentUnit::addBlockPercent(const QString &name, QMap<QString, InfoTuple> icdPercents)
+void PercentUnit::addBlockPercent(const QString &name, const QString &uuid, QMap<QString, InfoTuple> icdPercents)
 {
-    OneBlock *block = new OneBlock(name, icdPercents);
+    OneBlock *block = new OneBlock(name, uuid, icdPercents);
     blockList_.append(block);
 
     flowLayout_->addWidget(block);
@@ -75,8 +75,8 @@ void PercentUnit::mousePressEvent(QMouseEvent *event)
         rect.translate(offset_point);
         if(rect.contains(point)) {
             one->setActive(true);
-            QString blockFullname = one->getBlockFullName();
-            emit activeBlock(blockFullname);
+            QString uuid = one->getBlockUuid();
+            emit activeBlock(uuid);
             canShowMenu_ = true;
             currentBlock_ = one;
         } else {

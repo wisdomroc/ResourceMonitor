@@ -50,7 +50,7 @@ private:
 
 private slots:
     void slot_changeTheme(int theme);
-    void slot_activeBlockTreeView(const QString& blockFullname);
+    void slot_activeBlockTreeView(const QString& uuid);
     void slot_treeViewPressed(const QModelIndex &index);
 
     void on_pushButton_clearName_clicked();

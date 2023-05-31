@@ -20,30 +20,43 @@ WComboBox::WComboBox(QWidget *parent):QComboBox (parent)
     m_listView->viewport()->installEventFilter(this);
 }
 
+QStringList WComboBox::getCheckedUuidData()
+{
+    QStringList checkedData;
+    for(int i = 0; i < m_model->rowCount(); i ++)
+    {
+        if(m_model->item(i)->checkState() == Qt::Checked) {
+            checkedData.append(m_model->item(i)->data(UUID_ROLE).toString());
+        }
+
+    }
+    return checkedData;
+}
+
 QStringList WComboBox::getCheckedToolTipData()
 {
-        QStringList checkedData;
-        for(int i = 0; i < m_model->rowCount(); i ++)
-        {
-            if(m_model->item(i)->checkState() == Qt::Checked) {
-                checkedData.append(m_model->item(i)->data(Qt::ToolTipRole).toString());
-            }
-
+    QStringList checkedData;
+    for(int i = 0; i < m_model->rowCount(); i ++)
+    {
+        if(m_model->item(i)->checkState() == Qt::Checked) {
+            checkedData.append(m_model->item(i)->data(Qt::ToolTipRole).toString());
         }
-        return checkedData;
+
+    }
+    return checkedData;
 }
 
 QStringList WComboBox::getCheckedData()
 {
-        QStringList checkedData;
-        for(int i = 0; i < m_model->rowCount(); i ++)
-        {
-            if(m_model->item(i)->checkState() == Qt::Checked) {
-                checkedData.append(m_model->item(i)->text());
-            }
-
+    QStringList checkedData;
+    for(int i = 0; i < m_model->rowCount(); i ++)
+    {
+        if(m_model->item(i)->checkState() == Qt::Checked) {
+            checkedData.append(m_model->item(i)->text());
         }
-        return checkedData;
+
+    }
+    return checkedData;
 }
 
 QMap<QString, int> WComboBox::getCheckStates()
@@ -66,6 +79,7 @@ void WComboBox::addItems(const QMultiHash<QString, BlockInfoPtr>& hash)
         item->setCheckState(Qt::Unchecked);
         QString fullname = itor.value()->namepath;
         item->setToolTip(fullname);
+        item->setData(itor.value()->uuid, UUID_ROLE);
         m_model->appendRow(item);
     }
 }
@@ -156,17 +170,17 @@ void WComboBox::hidePopup()
     int y = QCursor::pos().y() - mapToGlobal(this->geometry().topLeft()).y() + this->geometry().y();
     if(!rect.contains(x, y))
     {
-        QStringList values;
-        for (int i=0; i < m_completer->popup()->model()->rowCount(); i++){
-            QModelIndex index = m_completer->popup()->model()->index(i, 0, QModelIndex());
-            qDebug() << index.data(Qt::DisplayRole).toString() << endl;
-          if (m_completer->popup()->model()->data(index, Qt::CheckStateRole).toBool()){
-            values << index.data(Qt::DisplayRole).toString();
-          }
-        }
-        if(!values.isEmpty()) {
-            setCurrentText(values.join(","));
-        }
+//        QStringList values;
+//        for (int i=0; i < m_completer->popup()->model()->rowCount(); i++){
+//            QModelIndex index = m_completer->popup()->model()->index(i, 0, QModelIndex());
+//            qDebug() << index.data(Qt::DisplayRole).toString() << endl;
+//          if (m_completer->popup()->model()->data(index, Qt::CheckStateRole).toBool()){
+//            values << index.data(Qt::DisplayRole).toString();
+//          }
+//        }
+//        if(!values.isEmpty()) {
+//            setCurrentText(values.join(","));
+//        }
 
 
         QComboBox::hidePopup();

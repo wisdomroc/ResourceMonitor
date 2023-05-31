@@ -21,6 +21,7 @@ class WComboBox : public QComboBox
 public:
     WComboBox(QWidget *parent = nullptr);
 
+    QStringList getCheckedUuidData();
     QStringList getCheckedToolTipData();
     QStringList getCheckedData();
     QMap<QString,int> getCheckStates();
