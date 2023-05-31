@@ -12,8 +12,29 @@
 #include <QLineEdit>
 #include <QListView>
 #include <QCompleter>
+#include <QLineEdit>
 #include <QStandardItemModel>
 #include "global.h"
+
+class WLineEdit : public QLineEdit
+{
+    Q_OBJECT
+public:
+    WLineEdit(QWidget *parent = nullptr):QLineEdit(parent)
+    {
+
+    }
+
+protected:
+    void focusInEvent(QFocusEvent *event) {
+        emit focusIn();
+    };
+
+signals:
+    void focusIn();
+
+
+};
 
 class WComboBox : public QComboBox
 {
@@ -45,18 +66,20 @@ private slots:
     void slot_activated(int index);
     void slot_hideListView(QString str);
     void slot_editingFinished(QString str);
+//    void slot_cursorPositionChanged(int old, int new);
 
 signals:
     void done();
 
 private:
-    QLineEdit           *m_lineEdit;
-    QCompleter          *m_completer;
-    QListView           *m_listView;
-    QStandardItemModel  *m_model;
-    bool                isModified_;
-    bool                isPermitHidePopup;
-    QStringList         selectedStrList;
+    WLineEdit               *m_lineEdit;
+    QCompleter              *m_completer;
+    QListView               *m_listView;
+    QStandardItemModel      *m_model;
+    bool                    isModified_;
+    bool                    isPermitHidePopup;
+    QStringList             selectedStrList;
+    bool                    popupFlag_;
 };
 
 #endif // WCOMBOBOX_H

@@ -3,7 +3,9 @@
 
 WComboBox::WComboBox(QWidget *parent):QComboBox (parent)
 {
-    m_lineEdit  = new QLineEdit();
+    isModified_ = false;
+    popupFlag_  = false;
+    m_lineEdit  = new WLineEdit();
     m_completer = new QCompleter();
     m_model     = new QStandardItemModel();
     m_listView  = new QListView();
@@ -17,6 +19,7 @@ WComboBox::WComboBox(QWidget *parent):QComboBox (parent)
     connect(m_completer, SIGNAL(activated(QString)), this, SLOT(slot_hideListView(QString)));
     connect(this, SIGNAL(activated(int)), this, SLOT(slot_activated(int)));
     connect(m_lineEdit, SIGNAL(textChanged(QString)), this, SLOT(slot_editingFinished(QString)));
+    connect(m_lineEdit, SIGNAL(cursorPositionChanged(int, int)), this, SLOT(slot_cursorPositionChanged(int, int)));
     m_listView->viewport()->installEventFilter(this);
 }
 
@@ -129,12 +132,15 @@ void WComboBox::updateText()
             checkedLabels.append(m_model->item(i)->text());
         }
     }
+    disconnect(m_lineEdit, SIGNAL(textChanged(QString)), this, SLOT(slot_editingFinished(QString)));
     m_lineEdit->setText(checkedLabels.join(","));
+    connect(m_lineEdit, SIGNAL(textChanged(QString)), this, SLOT(slot_editingFinished(QString)));
     m_lineEdit->setToolTip(checkedLabels.join(","));
 }
 
 void WComboBox::slot_activated(int index)
 {
+    qDebug() << "listview activated" << endl;
     QStandardItem *cur_item = m_model->item(index);
     if(!cur_item) return;
 
@@ -152,12 +158,9 @@ void WComboBox::slot_hideListView(QString str)
 
 void WComboBox::slot_editingFinished(QString str)
 {
-    if(str == "")
-    {
-        for (int i=0; i < m_completer->popup()->model()->rowCount(); i++){
-            QModelIndex index = m_completer->popup()->model()->index(i, 0, QModelIndex());
-            m_completer->popup()->model()->setData(index, Qt::Unchecked , Qt::CheckStateRole);
-        }
+    if(!popupFlag_) {
+        updateText();
+        qDebug() << "edit finished" << endl;
     }
 }
 
@@ -170,19 +173,6 @@ void WComboBox::hidePopup()
     int y = QCursor::pos().y() - mapToGlobal(this->geometry().topLeft()).y() + this->geometry().y();
     if(!rect.contains(x, y))
     {
-//        QStringList values;
-//        for (int i=0; i < m_completer->popup()->model()->rowCount(); i++){
-//            QModelIndex index = m_completer->popup()->model()->index(i, 0, QModelIndex());
-//            qDebug() << index.data(Qt::DisplayRole).toString() << endl;
-//          if (m_completer->popup()->model()->data(index, Qt::CheckStateRole).toBool()){
-//            values << index.data(Qt::DisplayRole).toString();
-//          }
-//        }
-//        if(!values.isEmpty()) {
-//            setCurrentText(values.join(","));
-//        }
-
-
         QComboBox::hidePopup();
         if(isModified_) {
             isModified_ = false;
@@ -193,40 +183,63 @@ void WComboBox::hidePopup()
 
 bool WComboBox::eventFilter(QObject * watched, QEvent * event)
 {
+    if(event->type() == QEvent::Show)
+    {
+        popupFlag_ = true;
+        qDebug() << "popup show" << endl;
+    }
+    if (event->type() == QEvent::Hide)
+    {
+        qDebug() <<"popup hide" << endl;
+        updateText();
+        if(isModified_)
+        {
+            emit done();
+            isModified_ = false;
+        }
+        popupFlag_ = false;
+    }
     if (event->type() == QEvent::MouseButtonRelease)
     {
         QModelIndex ind = m_completer->popup()->indexAt(((QMouseEvent*)event)->pos());
 
-        QString tooltip = m_completer->popup()->model()->data(ind, Qt::ToolTipRole).toString();
-        qDebug() <<"tooltip:" << tooltip << endl;
-        qDebug() << "model.rowCount: " << m_model->rowCount() << endl;
+        QString uuid = m_completer->popup()->model()->data(ind, UUID_ROLE).toString();
         QModelIndex rootIndex = m_model->invisibleRootItem()->index();
         int findRow = -1;
         for(int i = 0; i < m_model->rowCount(); ++i) {
-            QString str = m_model->index(i, 0, rootIndex).data(Qt::ToolTipRole).toString();
-            if(str == tooltip) {
+            QString str = m_model->index(i, 0, rootIndex).data(UUID_ROLE).toString();
+            if(str == uuid) {
                 findRow = i;
                 break;
             }
         }
+
         if(findRow != -1) {
-            //! step1
-            bool checked1 = m_completer->popup()->model()->data(ind, Qt::CheckStateRole).toBool();
+
             QString str   = m_completer->popup()->model()->data(ind, Qt::DisplayRole).toString();
+            bool checked1 = m_completer->popup()->model()->data(ind, Qt::CheckStateRole).toBool();
             if(checked1)
             {
+                //! step1
                 m_completer->popup()->model()->setData(ind, Qt::Unchecked , Qt::CheckStateRole);
-
+                //! step2
+                QStandardItem *findItem = m_model->item(findRow);
+                findItem->setCheckState(Qt::Unchecked);
             }
             else
             {
+                //! step1
                 m_completer->popup()->model()->setData(ind, Qt::Checked , Qt::CheckStateRole);
-
+                //! step1
+                QStandardItem *findItem = m_model->item(findRow);
+                findItem->setCheckState(Qt::Checked);
             }
 
-            //! step2, 不使用貌似也可以？
-//            QStandardItem *findItem = m_model->item(findRow);
-//            findItem->setCheckState(findItem->checkState() == Qt::Unchecked ? Qt::Checked : Qt::Unchecked);
+            isModified_ = true;
+        }
+        else
+        {
+            qDebug() << "will never be reached" << endl;
         }
         return true;
     }
